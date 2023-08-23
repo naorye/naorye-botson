@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Metric Chart</title>
+  </head>
+  <body>
+    <div>
+      <canvas id="canvas"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.27.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@0.1.1"></script>
+
+    <script>
+      const ctx = document.getElementById("canvas");
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const metric = urlParams.get("metric");
+
+      fetch(`../data/event-rates.json`)
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (data) {
+          console.log(
+            data.map((entry) => ({
+              x: entry.timestamp,
+              y: entry.rate,
+            }))
+          );
+          new Chart(ctx, {
+            type: "line",
+            data: {
+              // labels: Object.keys(data),
+              datasets: [
+                {
+                  label: "Event Rates",
+                  data: data.map((entry) => ({
+                    x: entry.timestamp,
+                    y: entry.rate,
+                  })),
+                  borderWidth: 1,
+                },
+              ],
+            },
+            options: {
+              scales: {
+                x: {
+                  type: "time",
+                  time: {
+                    // Luxon format string
+                    tooltipFormat: "hh:mm:ss",
+                  },
+                  title: {
+                    display: true,
+                    text: "Time",
+                  },
+                },
+                y: {
+                  title: {
+                    display: true,
+                    text: "Rate",
+                  },
+                },
+              },
+            },
+          });
+        });
+    </script>
+  </body>
+</html>
